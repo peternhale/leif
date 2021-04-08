@@ -27,28 +27,19 @@ interface AnyObject {
   [key: string]: any;
 }
 
-function transformArrayToObject(source: AnyObject) {
-  if (Array.isArray(source) && source.map(s => typeof s === 'object').reduce((a, b) => a && b, true)) {
-    return source.reduce((a, b) => Object.assign(a, b), {})
-  }
-  return source
-}
-
 export function deepAssign(target: AnyObject, source: AnyObject): AnyObject {
-  const tt = transformArrayToObject(target)
-  const st = transformArrayToObject(source)
-  Object.keys(st).forEach(k => {
+  Object.keys(source).forEach(k => {
     if (typeof source[k] === 'object') {
       // eslint-disable-next-line no-negated-condition
-      if (!Reflect.has(tt, k)) {
+      if (!target[k]) {
         // doesn't exist, just assign it
-        tt[k] = st[k]
+        target[k] = source[k]
       } else {
-        const newTk = deepAssign(tt[k], st[k])
+        const newTk = deepAssign(target[k], source[k])
         target[k] = newTk
       }
     } else {
-      tt[k] = st[k]
+      target[k] = source[k]
     }
   })
   return target
